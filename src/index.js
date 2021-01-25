@@ -1,12 +1,16 @@
 const express = require("express");
+require("dotenv").config();
+
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
-
+const trackRoutes = require('./routes/trackRoutes')
+const requireAuth = require('./middlewares/requireAuth');
 
 const app = express();
 app.use(express.json()); //Used to parse JSON bodies
 
 app.use(authRoutes);
+app.use(trackRoutes);
 
 
 const mongoUri = 'mongodb+srv://adminTracker:lahore$U4@cluster0.zjv87.mongodb.net/<dbname>?retryWrites=true&w=majority'
@@ -22,8 +26,8 @@ mongoose.connection.on('connected', ()=>{
 mongoose.connection.on('error', (err)=>{
   console.log('error connecting to mongo', err);
 })
-app.get("/", (req, res) => {
-  res.send("Hi there");
+app.get('/', requireAuth, (req, res) => {
+  res.send(`Your email: ${req.user.email}`);
 });
 
 app.listen(3000, () => {

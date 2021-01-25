@@ -2,24 +2,46 @@ const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../models/user')
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
+router.post('/signup', async (req, res) => {
+  const { email, password } = req.body;
 
-router.post('/signup', async (req,res) => {
-    try {
-        
-        const {email, password } = req.body;
-        let hashedPwd = bcrypt.hashSync(password, 10);
-        const user =  User({email : email, password: hashedPwd});
-        await user.save();
-    } catch (error) {
-        console.log(error)
-    }
+  try {
+    const user = new User({ email, password });
+    await user.save();
 
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_PRIVATE_KEY);
+    res.send({ token });
+  } catch (err) {
+    return res.status(422).send(err.message);
+  }
+});
 
+router.post('/signin', async (req, res) => {
+  const { email, password } = req.body;
 
-    res.send(' You made it')
-})
+  if (!email || !password) {
+    return res.status(422).send({ error: 'Must provide email and password' });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(422).send({ error: 'Invalid password or email' });
+  }
+
+  try {
+    await user.comparePassword(password);
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_PRIVATE_KEY);
+    res.send({ token });
+  } catch (err) {
+    return res.status(422).send({ error: 'Invalid password or email' });
+  }
+});
+
+module.exports = router;
+
 
 module.exports = router
