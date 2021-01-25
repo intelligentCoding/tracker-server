@@ -2,8 +2,13 @@ const express = require("express");
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 
+
 const app = express();
+app.use(express.json()); //Used to parse JSON bodies
+
 app.use(authRoutes);
+
+
 const mongoUri = 'mongodb+srv://adminTracker:lahore$U4@cluster0.zjv87.mongodb.net/<dbname>?retryWrites=true&w=majority'
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
