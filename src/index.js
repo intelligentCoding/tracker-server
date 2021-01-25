@@ -13,7 +13,7 @@ app.use(authRoutes);
 app.use(trackRoutes);
 
 
-const mongoUri = 'mongodb+srv://adminTracker:lahore$U4@cluster0.zjv87.mongodb.net/<dbname>?retryWrites=true&w=majority'
+const mongoUri = 'MONGO_URI'
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
